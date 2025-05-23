@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <title>Resultat</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Resultats SNMP</h1>
+    <div class="result-list">
+      {% for line in result %}
+        {% if '=' in line and line.split('=')|length > 1 %}
+          <div class="result-item">
+            <div class="enunciat">{{ line.split('=')[0].strip() }}</div>
+            <div class="resposta">{{ line.split('=')[1].strip() }}</div>
+          </div>
+        {% else %}
+          <div class="result-item error">
+            <div class="enunciat">Entrada no vàlida</div>
+            <div class="resposta">{{ line }}</div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    <a href="/" class="button">Tornar al formulari</a>
+  </div>
+</body>
+</html>

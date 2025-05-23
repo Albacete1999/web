@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Detalles del Trap #{{ trap_id }}</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>OID</th>
+            <th>Valor</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for varbind in varbinds %}
+        <tr>
+            <td>{{ varbind.oid }}</td>
+            <td>{{ varbind.value }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{{ url_for('view_traps') }}" class="btn btn-primary">Volver a la lista</a>
+{% endblock %}

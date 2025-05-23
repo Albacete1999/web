@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>SNMP Traps</h3>
+
+<form method="GET" action="{{ url_for('view_traps') }}">
+    <div class="form-group">
+        <label>Fecha exacta:</label>
+        <input type="date" name="exact_date" class="form-control" value="{{ request.args.get('exact_date', '') }}">
+        <br>
+        <label>Fecha inicio:</label>
+        <input type="date" name="start_date" class="form-control" value="{{ request.args.get('start_date', '') }}">
+        <label>Fecha fin:</label>
+        <input type="date" name="end_date" class="form-control" value="{{ request.args.get('end_date', '') }}">
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+    </div>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Trap ID</th>
+            <th>Fecha/Hora</th>
+            <th>Transport</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if traps %}
+            {% for trap in traps %}
+            <tr>
+                <td>
+                    <a href="{{ url_for('trap_detail', trap_id=trap.trap_id) }}">
+                        {{ trap.trap_id }}
+                    </a>
+                </td>
+                <td>{{ trap.date_time }}</td>
+                <td>{{ trap.transport }}</td>
+                <td>
+                    <a href="{{ url_for('trap_detail', trap_id=trap.trap_id) }}" class="btn btn-info btn-sm">Ver detalles</a>
+                </td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="4">No hay traps para los filtros seleccionados.</td>
+            </tr>
+        {% endif %}
+    </tbody>
+</table>
+{% endblock %}

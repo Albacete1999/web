@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block content %}
+<link rel="stylesheet" href="/static/styles.css">
+
+<div class="container" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+    <h1 style="text-align: center;">MIB Browser</h1>
+
+    <a href="{{ url_for('view_traps') }}" class="button"
+       style="margin-bottom: 20px; display: inline-block; text-align: center;">Ver Traps</a>
+
+    <form method="POST" action="{{ url_for('snmp') }}" onsubmit="return setOidValue();" style="width: 100%; max-width: 450px;">
+        <div class="form-group">
+            <label for="agent_ip">IP Agent</label>
+            <input type="text" id="agent_ip" name="agent_ip" value="10.0.2.5">
+        </div>
+
+        <div class="form-group">
+            <label for="version">Versió SNMP</label>
+            <select id="version" name="version">
+                <option value="1">v1</option>
+                <option value="2c">v2c</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="community">Comunitat</label>
+            <input type="text" id="community" name="community">
+        </div>
+
+        <div class="form-group">
+            <label for="oid_select">OID (selecciona o escriu a mà):</label>
+            <select id="oid_select" class="form-control">
+                {% for oid in oids %}
+                <option value="{{ oid.oid }}">{{ oid.traduccion }} ({{ oid.oid }})</option>
+                {% endfor %}
+            </select>
+            <input type="text" id="oid_manual" placeholder="Escriu un OID manualment">
+            <input type="hidden" id="oid" name="oid">
+        </div>
+
+        <div class="form-group">
+            <label for="set_type">Tipus de valor</label>
+            <select id="set_type" name="set_type">
+                <option value="OctetString">OctetString</option>
+                <option value="Integer">Integer</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="set_value">Valor a establir</label>
+            <input type="text" id="set_value" name="set_value">
+        </div>
+
+        <div class="form-group">
+            <label for="operation">Operació</label>
+            <select id="operation" name="operation">
+                <option value="get">GET</option>
+                <option value="next">NEXT</option>
+                <option value="set">SET</option>
+                <option value="bulkwalk">BULKWALK</option>
+            </select>
+        </div>
+
+        <button type="submit">Enviar</button>
+    </form>
+</div>
+
+<script>
+function setOidValue() {
+    var manual = document.getElementById('oid_manual').value.trim();
+    var select = document.getElementById('oid_select').value;
+    document.getElementById('oid').value = manual !== "" ? manual : select;
+    return true;
+}
+</script>
+{% endblock %}

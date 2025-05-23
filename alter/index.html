@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SNMP MIB Browser</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .oid-input-group {
+            display: flex;
+            gap: 10px;
+        }
+        .oid-input-group select, .oid-input-group input {
+            flex: 1;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        .nav-button {
+            background-color: #008CBA;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SNMP MIB Browser</h1>
+        <form method="POST">
+            <div class="form-group">
+                <label for="host">Host:</label>
+                <input type="text" id="host" name="host" required placeholder="Ex: 192.168.1.1">
+            </div>
+
+            <div class="form-group">
+                <label for="version">SNMP Version:</label>
+                <select id="version" name="version">
+                    <option value="1">SNMPv1</option>
+                    <option value="2c">SNMPv2c</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="community">Community:</label>
+                <input type="text" id="community" name="community" required placeholder="Ex: public">
+            </div>
+
+            <div class="form-group">
+                <label for="oid">OID:</label>
+                <div class="oid-input-group">
+                    <select id="oid_select" onchange="updateOidInput()">
+                        <option value="">Select common OID</option>
+                        {% for name, oid in oids.items() %}
+                        <option value="{{ oid }}">{{ name }} ({{ oid }})</option>
+                        {% endfor %}
+                    </select>
+                    <input type="text" id="oid" name="oid" required placeholder="Enter OID manually">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="operation">Operation:</label>
+                <select id="operation" name="operation" onchange="toggleSetOptions()">
+                    <option value="get">SNMP GET</option>
+                    <option value="next">SNMP NEXT</option>
+                    <option value="bulkwalk">SNMP BULKWALK</option>
+                    <option value="set">SNMP SET</option>
+                </select>
+            </div>
+
+            <div id="setOptions" style="display: none;">
+                <div class="form-group">
+                    <label for="value">Value:</label>
+                    <input type="text" id="value" name="value">
+                </div>
+
+                <div class="form-group">
+                    <label for="value_type">Value Type:</label>
+                    <select id="value_type" name="value_type">
+                        <option value="Integer">Integer</option>
+                        <option value="String">String</option>
+                        <option value="OctetString">Octet String</option>
+                        <option value="ObjectIdentifier">Object Identifier</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit">Execute Operation</button>
+        </form>
+
+        {% if error %}
+        <div class="error">
+            <h3>Error:</h3>
+            <pre>{{ error }}</pre>
+        </div>
+        {% endif %}
+        
+        {% if result %}
+        <div class="result">
+            <h3>Resultat de la consulta SNMP</h3>
+            {% if operation_info %}
+            <div class="operation-details">
+                <p><strong>Dispositiu:</strong> {{ operation_info.host }}</p>
+                <p><strong>Versió SNMP:</strong> {{ operation_info.version }}</p>
+                <p><strong>Operació:</strong> {{ operation_info.operation.upper() }}</p>
+                <p><strong>OID:</strong> {{ operation_info.oid }}</p>
+                {% if operation_info.operation == 'set' %}
+                <p><strong>Valor:</strong> {{ operation_info.value }}</p>
+                <p><strong>Tipus de valor:</strong> {{ operation_info.value_type }}</p>
+                {% endif %}
+            </div>
+            <hr>
+            {% endif %}
+            <div class="result-data">
+                <h4>Resposta:</h4>
+                <pre>{{ result }}</pre>
+            </div>
+            <button class="nav-button" onclick="window.location.href='/'">Nova consulta</button>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function toggleSetOptions() {
+            var operation = document.getElementById('operation').value;
+            var setOptions = document.getElementById('setOptions');
+            setOptions.style.display = operation === 'set' ? 'block' : 'none';
+        }
+
+        function updateOidInput() {
+            var select = document.getElementById('oid_select');
+            var input = document.getElementById('oid');
+            if (select.value) {
+                input.value = select.value;
+            }
+        }
+    </script>
+</body>
+</html>

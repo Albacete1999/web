@@ -1,0 +1,6 @@
+{
+    "gitea.instanceURL": "http://192.168.1.32:3000/Sohaib/Projecte_3.git",
+    "gitea.owner": "gitea",
+    "gitea.repo": "Projecte_3",
+    "gitea.debug": true
+}
